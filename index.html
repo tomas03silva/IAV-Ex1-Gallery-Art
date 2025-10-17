@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <title>Galeria VR Moderna</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+  <!-- Componente para limitar movimento da câmera -->
+  <script>
+    AFRAME.registerComponent('boundary', {
+      schema: {
+        minX: {type: 'number', default: -9},
+        maxX: {type: 'number', default: 9},
+        minZ: {type: 'number', default: -9},
+        maxZ: {type: 'number', default: 9},
+      },
+      tick: function () {
+        const pos = this.el.getAttribute('position');
+        let x = pos.x;
+        let z = pos.z;
+
+        if (x < this.data.minX) x = this.data.minX;
+        if (x > this.data.maxX) x = this.data.maxX;
+        if (z < this.data.minZ) z = this.data.minZ;
+
+        this.el.setAttribute('position', {x: x, y: pos.y, z: z});
+      }
+    });
+  </script>
+</head>
+<body>
+  <a-scene>
+    <!-- Luz ambiente geral -->
+    <a-entity light="type: ambient; intensity: 1; color: #ffffff"></a-entity>
+
+    <!-- Luzes direcionadas -->
+    <a-entity light="type: spot; color: #FF6B6B; intensity: 1; angle: 40; target: #balenciaga" position="-4 4 -5"></a-entity>
+    <a-entity light="type: spot; color: #6BCBFF; intensity: 1; angle: 40; target: #mask" position="4 4 -5"></a-entity>
+
+    <!-- Chão -->
+    <a-plane src="https://cdn.aframe.io/a-painter/images/floor.jpg"
+             rotation="-90 0 0" width="20" height="20" repeat="5 5"></a-plane>
+
+    <!-- Teto -->
+    <a-box color="#2e003e" position="0 4 0" depth="20" height="0.2" width="20"></a-box>
+
+    <!-- Paredes -->
+    <a-box color="#4B0082" position="0 1 -10" depth="0.2" height="8" width="20"></a-box>
+    <a-box color="#4B0082" position="10 1 0" rotation="0 -90 0" depth="0.2" height="8" width="20"></a-box>
+    <a-box color="#4B0082" position="-10 1 0" rotation="0 90 0" depth="0.2" height="8" width="20"></a-box>
+
+    <!-- Laterais da entrada -->
+    <a-box color="#4B0082" position="-7 1 10" depth="0.2" height="8" width="6"></a-box>
+    <a-box color="#4B0082" position="7 1 10" depth="0.2" height="8" width="6"></a-box>
+
+    <!-- Vitrine esquerda -->
+    <a-box color="#222" position="-4 0.5 -5" width="1.2" height="1" depth="1.2"></a-box>
+    <a-box color="#888" opacity="0.2" position="-4 1.3 -5" width="1.2" height="1.6" depth="1.2" transparent="true"></a-box>
+
+    <!-- Objeto Balenciaga -->
+    <a-entity id="balenciaga" 
+              class="clickable"
+              gltf-model="balenciga-glass.glb" 
+              position="-4 1.5 -5" 
+              rotation="0 45 0" 
+              scale="0.1 0.1 0.1"
+              animation="property: rotation; to: 0 405 0; loop: true; dur: 5000">
+    </a-entity>
+
+    <!-- Fundo da placa -->
+    <a-plane position="-4 0.3 -4.3" width="1.6" height="0.4" color="#111" material="opacity:0.8"></a-plane>
+    <!-- Texto visível e destacado -->
+    <a-text value="Balenciaga Glasses" 
+            color="#FFD700"
+            position="-4 0.3 -4.29" 
+            align="center"
+            width="4"
+            
+            
+            font="https://cdn.aframe.io/fonts/Exo2Bold.fnt">
+    </a-text>
+
+    <!-- Vitrine direita -->
+    <a-box color="#222" position="4 0.5 -5" width="1.2" height="1" depth="1.2"></a-box>
+    <a-box color="#888" opacity="0.2" position="4 1.3 -5" width="1.2" height="1.6" depth="1.2" transparent="true"></a-box>
+
+    <!-- Objeto Wolf Mask -->
+    <a-entity id="mask" 
+          gltf-model="wolf_mask.glb"
+          class="clickable"
+          position="4 1.5 -5"  
+          rotation="0 45 0"
+          scale="0.0025 0.0025 0.0025"
+          animation="property: rotation; to: 0 405 0; loop: true; dur: 5000">
+    </a-entity>
+
+    <a-entity id="wolfSound" sound="src: wolfsound.mp3; volume: 2"></a-entity>
+
+
+    <!-- Fundo da placa -->
+    <a-plane position="4 0.3 -4.3" width="1.6" height="0.4" color="#111" material="opacity:0.8"></a-plane>
+    <!-- Texto visível e destacado -->
+    <a-text value="Wolf Mask" 
+            color="#00BFFF"
+            position="4 0.3 -4.29" 
+            align="center"
+            width="4"
+            
+            
+            font="https://cdn.aframe.io/fonts/Exo2Bold.fnt">
+    </a-text>
+
+    <!-- Portal -->
+    <a-ring position="0 1.5 -8" 
+            radius-inner="0.5" 
+            radius-outer="0.7"
+            color="#FFD700" 
+            class="clickable" 
+            id="portal">
+    </a-ring>
+
+    <!-- Câmera -->
+    <a-entity id="cameraRig" position="0 1.6 8" 
+              wasd-controls look-controls
+              boundary="minX: -9; maxX: 9; minZ: -9; maxZ: 9">
+      <a-entity camera>
+        <a-cursor raycaster="objects: .clickable" material="color: black; shader: flat"></a-cursor>
+                <!-- Overlay escuro (invisível por padrão) -->
+          <a-plane id="darkOverlay" 
+                  color="#000000" 
+                  width="2" 
+                  height="2" 
+                  opacity="0" 
+                  position="0 0 -1" 
+                  visible="false">
+          </a-plane>
+
+          <!-- Texto "Balenciaga View" (invisível por padrão) -->
+          <a-text id="balenciagaText"
+                  value="BALENCIAGA VIEW"
+                  align="center"
+                  color="#FFD700"
+                  width="2"
+                  position="0 0 -0.9"
+                  visible="false"
+                  font="https://cdn.aframe.io/fonts/Exo2Bold.fnt">
+          </a-text>
+      </a-entity>
+    </a-entity>
+  </a-scene>
+
+  <script>
+    const portal = document.querySelector('#portal');
+    const cameraRig = document.querySelector('#cameraRig');
+    const wolfSound = document.querySelector('#wolfSound');
+    const mask = document.querySelector('#mask');
+    const balenciaga = document.querySelector('#balenciaga');
+    const overlay = document.querySelector('#darkOverlay');
+    const balenciagaText = document.querySelector('#balenciagaText');
+
+    portal.addEventListener('click', () => {
+      cameraRig.setAttribute('position', '0 1.6 0');
+    });
+
+    // Som de uivo ao clicar na máscara
+    mask.addEventListener('click', () => {
+      wolfSound.components.sound.playSound();
+    });
+
+      // Efeito Balenciaga View ao clicar nos óculos
+    balenciaga.addEventListener('click', () => {
+      overlay.setAttribute('visible', true);
+      overlay.setAttribute('opacity', 0.6); // escurece a visão
+      balenciagaText.setAttribute('visible', true);
+
+      // Após 3 segundos, some tudo novamente
+      setTimeout(() => {
+        overlay.setAttribute('visible', false);
+        balenciagaText.setAttribute('visible', false);
+        overlay.setAttribute('opacity', 0);
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
